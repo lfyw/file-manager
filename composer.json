@@ -1,0 +1,35 @@
+{
+    "name": "littledragoner\/file-manager",
+    "description": "A file manager",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "littledragoner",
+            "email": "littledragoner@163.com"
+        }
+    ],
+    "require": {
+        "php" : "^7.2.5",
+        "illuminate/support": "^5.8|^6.0|^7.0",
+        "illuminate/http": "^5.8|^6.0|^7.0",
+        "illuminate/contracts": "^5.8|^6.0|^7.0",
+        "illuminate/database": "^5.8|^6.0|^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "littledragoner\\FileManager\\": [
+                "src"
+            ]
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "littledragoner\\FileManager\\FileManagerProvider"
+            ]
+        }
+    }
+}
