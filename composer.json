@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "littledragoner\\FileManager\\": [
+            "Littledragoner\\FileManager\\": [
                 "src"
             ]
         },
@@ -27,7 +27,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "littledragoner\\FileManager\\FileManagerProvider"
+                "Littledragoner\\FileManager\\FileManagerProvider"
             ]
         }
     }

@@ -1,9 +1,9 @@
 <?php
 
 
-namespace littledragoner\FileManager\Models;
+namespace Littledragoner\FileManager\Models;
 
-use littledragoner\FileManager\Observers\FileObserver;
+use Littledragoner\FileManager\Observers\FileObserver;
 use Illuminate\Database\Eloquent\Model;
 
 class File extends Model

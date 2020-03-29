@@ -1,9 +1,9 @@
 <?php
 
 
-namespace littledragoner\FileManager\Observers;
+namespace Littledragoner\FileManager\Observers;
 
-use littledragoner\FileManager\Models\File;
+use Littledragoner\FileManager\Models\File;
 use Illuminate\Support\Facades\Storage;
 
 class FileObserver

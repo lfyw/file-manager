@@ -1,7 +1,7 @@
 <?php
 
 
-namespace littledragoner\FileManager;
+namespace Littledragoner\FileManager;
 
 use Illuminate\Support\ServiceProvider;
 

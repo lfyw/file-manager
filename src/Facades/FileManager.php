@@ -1,7 +1,7 @@
 <?php
 
 
-namespace littledragoner\FileManager\Facades;
+namespace Littledragoner\FileManager\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -9,6 +9,6 @@ class FileManager extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return new FileManager();
+        return new \Littledragoner\FileManager\FileManager();
     }
 }

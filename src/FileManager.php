@@ -1,10 +1,12 @@
 <?php
 
 
-namespace littledragoner\FileManager;
+namespace Littledragoner\FileManager;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Storage;
-use littledragoner\FileManager\Models\File;
+use Littledragoner\FileManager\Exceptions\AssociateMethodNotExist;
+use Littledragoner\FileManager\Models\File;
 
 class FileManager
 {
@@ -15,6 +17,9 @@ class FileManager
      */
     public function store($file): array
     {
+        if (!$file){
+            throw new FileNotFoundException();
+        }
         //原文件信息
         $clientOriginalExtension = $file->getClientOriginalExtension();//原扩展名
         $clientOriginalName = $file->getClientOriginalName();//原文件名
@@ -23,6 +28,7 @@ class FileManager
         $clientMineType = $file->getClientMimeType();//mime类型
         $extension = $file->extension();//扩展名
         $size = $file->getSize();//文件大小
+
         //保存文件
         $temporaryPath = 'public/temporary';
         $path = $file->store($temporaryPath);
@@ -77,9 +83,13 @@ class FileManager
     {
         if (!is_null($fileIds)) {
             $fileIds = is_array($fileIds) ? $fileIds : [$fileIds];
-            $changes = $model->$relation()->sync(sync_format_keys(array_filter($fileIds), ['model_type' => $modelType, 'file_type' => $fileType]));
-            $this->move($changes['attached']);
-            File::destroy($changes['detached']);
+            try {
+                $changes = $model->$relation()->sync(sync_format_keys(array_filter($fileIds), ['model_type' => $modelType, 'file_type' => $fileType]));
+                $this->move($changes['attached']);
+                File::destroy($changes['detached']);
+            }catch (\Exception $exception){
+                throw new AssociateMethodNotExist();
+            }
         }
     }
 }

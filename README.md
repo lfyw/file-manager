@@ -51,7 +51,10 @@ If you want to use this file on some model, you should create an method in the m
 ```php
     public function files()
     {
-        return $this->belongsToMany(File::class, 'file_model', 'model_id', 'file_id', 'id', 'id')->withPivot(['model_type', 'file_type'])->wherePivot('model_type', 'user')->wherePivot('file_type', 'test');
+        return $this->belongsToMany(File::class, 'file_model', 'model_id', 'file_id', 'id', 'id')
+            ->withPivot(['model_type', 'file_type'])
+            ->wherePivot('model_type', 'user')
+            ->wherePivot('file_type', 'test');
     }
 ```
 The ```model_type``` means the model this file associate with so that you can get that file by the model method.The ```file_type``` field means different field in one model. The below method shows that:
@@ -62,10 +65,17 @@ The ```model_type``` means the model this file associate with so that you can ge
  
  Now, everything is easy. If I want to add a user's avatar,i just need do this:
  ```php
+    //injection \Littledragoner\FileManager\FileManager::class 
     public function store(FileManager $fileManager)
     {
         $user = User::find(1);
         $fileManager->sync($user, 'user', 9, 'test');
+    }
+    //facades
+    public function store()
+    {
+        $user = User::find(1);
+        \Littledragoner\FileManager\Facades\FileManager::sync($user, 'user', 9, 'test');
     }
 ```  
 That means this user model has one avatar whose id is 9.I can get this user's avatar like this:
