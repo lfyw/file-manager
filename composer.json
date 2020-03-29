@@ -10,9 +10,9 @@
     ],
     "require": {
         "php" : "^7.2.5",
-        "illuminate/support": "5.5.*",
-        "illuminate/container": "5.5.*",
-        "illuminate/database": "5.5.*"
+        "illuminate/support": "5.8.*|6.*|7.*",
+        "illuminate/container": "5.8.*|6.*|7.*",
+        "illuminate/database": "5.8.*|6.*|7.*"
     },
     "autoload": {
         "psr-4": {
