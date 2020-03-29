@@ -4,7 +4,6 @@
 namespace littledragoner\FileManager;
 
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use littledragoner\FileManager\Models\File;
 
 class FileManager
@@ -14,7 +13,7 @@ class FileManager
      * @param bool $changeName
      * @return array
      */
-    public function store($file)
+    public function store($file): array
     {
         //原文件信息
         $clientOriginalExtension = $file->getClientOriginalExtension();//原扩展名
@@ -53,7 +52,7 @@ class FileManager
      * 移动文件从临时文件夹到正式文件夹
      * @param array $fileIds 文件id数组
      */
-    protected function move(array $fileIds = [])
+    protected function move(array $fileIds = []): void
     {
         $formalPath = '/uploads/' . date("Ym/d", time()) . '/';
         File::findMany($fileIds)->each(function ($item) use ($formalPath) {
@@ -74,7 +73,7 @@ class FileManager
      * @param array|string $fileIds sync的文件id数组
      * @param string|null $fileType 字段类型
      */
-    public function sync($model, $modelType, $fileIds, $fileType = null, $relation = 'files')
+    public function sync($model, $modelType, $fileIds, $fileType = null, $relation = 'files'): void
     {
         if (!is_null($fileIds)) {
             $fileIds = is_array($fileIds) ? $fileIds : [$fileIds];
