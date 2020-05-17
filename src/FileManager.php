@@ -18,7 +18,7 @@ class FileManager
      */
     public function store($file): array
     {
-        if (!$file){
+        if (!$file) {
             throw new FileNotFoundException();
         }
         //原文件信息
@@ -57,12 +57,15 @@ class FileManager
 
     /**
      * 移动文件从临时文件夹到正式文件夹
-     * @param array $fileIds 文件id数组
+     * @param  $fileIds
      */
-    public function move(array $fileIds = []): void
+    public function move($fileIds)
     {
+        if (!is_array($fileIds)) {
+            $fileIds = [$fileIds];
+        }
         $formalPath = '/uploads/' . date("Ym/d", time()) . '/';
-        File::findMany($fileIds)->each(function ($item) use ($formalPath) {
+        $files = File::findMany($fileIds)->each(function ($item) use ($formalPath) {
             if (Storage::disk('public')->exists($item->path)) {
                 //1.移入正式文件夹
                 Storage::move('public/' . $item->path, 'public/' . $formalPath . $item->save_name);
@@ -72,6 +75,7 @@ class FileManager
                 $item->save();
             }
         });
+        return $files;
     }
 
     /**
@@ -88,7 +92,7 @@ class FileManager
                 $changes = $model->$relation()->sync(sync_format_keys(array_filter($fileIds), ['model_type' => $modelType, 'file_type' => $fileType]));
                 $this->move($changes['attached']);
                 File::destroy($changes['detached']);
-            }catch (\Exception $exception){
+            } catch (\Exception $exception) {
                 throw new AssociateMethodNotExist();
             }
         }
