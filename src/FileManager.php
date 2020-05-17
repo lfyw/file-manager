@@ -11,6 +11,7 @@ use Littledragoner\FileManager\Models\File;
 class FileManager
 {
     /**
+     *
      * @param $file
      * @param bool $changeName
      * @return array
@@ -58,7 +59,7 @@ class FileManager
      * 移动文件从临时文件夹到正式文件夹
      * @param array $fileIds 文件id数组
      */
-    protected function move(array $fileIds = []): void
+    public function move(array $fileIds = []): void
     {
         $formalPath = '/uploads/' . date("Ym/d", time()) . '/';
         File::findMany($fileIds)->each(function ($item) use ($formalPath) {
