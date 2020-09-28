@@ -26,7 +26,7 @@ $ php artisan vendor:publish --tag='migrations'
 
 导出配置文件:
 ```shell script
-$ php artisan vendor:config --tag='config'
+$ php artisan vendor:publish --tag='config'
 ```
 
 `path`是文件存放目录；`clear_sync_file`是指同步完文件，是否删除同步中失效的文件，建议`true`

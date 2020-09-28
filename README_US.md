@@ -28,7 +28,7 @@ $ php artisan vendor:publish --tag='migrations'
 
 Publish config by:
 ```shell script
-$ php artisan vendor:config --tag='config'
+$ php artisan vendor:publish --tag='config'
 ```
 
 `path` means the directory that the files will be saved
