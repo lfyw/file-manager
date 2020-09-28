@@ -3,6 +3,7 @@
 
 namespace Littledragoner\FileManager;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\ServiceProvider;
 
 class FileManagerProvider extends ServiceProvider
@@ -12,21 +13,32 @@ class FileManagerProvider extends ServiceProvider
     public function boot()
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->registerWithFiles();
     }
 
     public function register()
     {
-        $this->app->singleton(FileManager::class, function () {
-            return new FileManager();
-        });
-
-        $this->app->alias(FileManager::class, 'fileManager');
+        $this->publishes([
+            __DIR__ . '/../database/migrations/' => database_path('migrations')
+        ], 'migrations');
+        $this->publishes([
+            __DIR__ . '/../config/file-manager.php' => config_path('file-manager.php'),
+        ], 'config');
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/file-manager.php', 'file-manager'
+        );
     }
 
-    public function provides()
+    protected function registerWithFiles()
     {
-        return [
-            FileManager::class, 'fileManager'
-        ];
+        Builder::macro('withFiles', function ($type = null) {
+            return $this->when($type, function ($builder) use ($type) {
+                return $builder::with(['files' => function ($builder) use ($type) {
+                    return $builder->where('file_type', $type);
+                }]);
+            }, function ($builder) {
+                return $builder::with('files');
+            });
+        });
     }
 }

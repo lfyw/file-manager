@@ -1,7 +1,7 @@
 <?php
 
 
-namespace littledragoner\FileManager\Exceptions;
+namespace Littledragoner\FileManager\Exceptions;
 
 
 class FileNotExistException extends Exception

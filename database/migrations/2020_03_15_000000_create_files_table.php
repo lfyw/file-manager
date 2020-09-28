@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 class CreateFilesTable extends Migration
 {
@@ -23,6 +24,7 @@ class CreateFilesTable extends Migration
             $table->json('extra')->nullable()->comment('文件额外信息');
             $table->timestamps();
         });
+        DB::statement("ALTER TABLE files comment '文件上传表'");
     }
 
     /**

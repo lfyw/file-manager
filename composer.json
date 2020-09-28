@@ -1,5 +1,5 @@
 {
-    "name": "littledragoner\/file-manager",
+    "name": "littledragoner/file-manager",
     "description": "A file manager",
     "license": "MIT",
     "authors": [
@@ -9,7 +9,9 @@
         }
     ],
     "require": {
-        "php" : "^7.2.5"
+        "php" : "^7.2.5",
+        "illuminate/database": "^8.6",
+        "illuminate/support": "^8.6"
     },
     "autoload": {
         "psr-4": {
