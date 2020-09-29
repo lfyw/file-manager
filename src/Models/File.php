@@ -5,7 +5,9 @@ namespace Littledragoner\FileManager\Models;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Littledragoner\FileManager\Observers\FileObserver;
 
 class File extends Model
@@ -30,15 +32,16 @@ class File extends Model
     /**
      * Upload and store a file
      * @param $file
-     * @param bool $changeName
+     * @param bool $ext 是否保存文件原后缀
      * @return array
      */
-    public static function upload($file)
+    public static function upload($file, $guessExtension = true)
     {
         throw_unless($file, new FileNotFoundException('File not found'));
-
         //保存文件
-        $path = Storage::putFile(config('file-manager.path'), $file);
+        $path = $guessExtension
+            ? Storage::putFile(config('file-manager.path'), $file)
+            : Storage::putFileAs(config('file-manager.path'), $file, Str::random(40) . $file->getClientOriginalExtension());
 
         return static::create([
             'original_name' => $file->getClientOriginalName(),//原文件名

@@ -39,13 +39,13 @@ return [
 
 * 上传文件
 
-像下面这样来上传文件:
+像下面这样来上传文件。可以传递第二个参数决定是否根据文件 MIME 类型推测文件后缀，默认`true`, 如果要保存文件的原后缀名请改为`false`
 ```php
 class FilesController extends Controller
 {
     public function store(Request $request)
     {
-        return \Littledragoner\FileManager\Models\File::upload($request->file('file'));
+        return \Littledragoner\FileManager\Models\File::upload($request->file('file', false));
     }
 }
 ```
