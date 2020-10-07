@@ -55,6 +55,14 @@ trait HasFiles
             : $this->load('files');
     }
 
+    public function detachFiles(): void
+    {
+        $this->files()->each(function ($file){
+            $file->delete();
+        });
+        $this->files()->sync([]);
+    }
+
     /**
      * Destroy file after sync
      * @param $changes
@@ -70,7 +78,7 @@ trait HasFiles
      * Check file id is in files table
      * @param $fileIds
      */
-    protected function isInTable($fileIds):void
+    protected function isInTable($fileIds): void
     {
         File::findOrFail($fileIds);
     }
