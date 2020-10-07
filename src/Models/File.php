@@ -41,7 +41,7 @@ class File extends Model
         //保存文件
         $path = $guessExtension
             ? Storage::putFile(config('file-manager.path'), $file)
-            : Storage::putFileAs(config('file-manager.path'), $file, Str::random(40) . '/'.$file->getClientOriginalExtension());
+            : Storage::putFileAs(config('file-manager.path'), $file, Str::random(40) . '.'.$file->getClientOriginalExtension());
 
         return static::create([
             'original_name' => $file->getClientOriginalName(),//原文件名
