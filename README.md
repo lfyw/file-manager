@@ -117,6 +117,11 @@ $user->loadFiles('avatar');
 ```
 User::withFiles('avatar')->get()
 ```
+要解除关系，可以使用:
+```php
+$user = User::find(1);
+$user->detachFiles('avatar');
+```
 
 ## License
 
