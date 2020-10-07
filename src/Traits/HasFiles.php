@@ -55,6 +55,13 @@ trait HasFiles
             : $this->load('files');
     }
 
+    /**
+     * Detach related files
+     */
+    public function detachFiles():void
+    {
+        $this->files()->detach();
+    }
 
     /**
      * Destroy file after sync
