@@ -70,7 +70,9 @@ trait HasFiles
     private function destroyFileAfterSync($changes): void
     {
         if (config('file-manager.clear_sync_file')) {
-            File::destroy($changes['detached']);
+            foreach ($changes['detached'] as $changeId){
+                File::destroy($changeId);
+            }
         }
     }
 
