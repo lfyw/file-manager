@@ -55,13 +55,6 @@ trait HasFiles
             : $this->load('files');
     }
 
-    public function detachFiles(): void
-    {
-        $this->files()->each(function ($file){
-            $file->delete();
-        });
-        $this->files()->sync([]);
-    }
 
     /**
      * Destroy file after sync
