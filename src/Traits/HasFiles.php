@@ -58,7 +58,7 @@ trait HasFiles
     /**
      * Detach related files
      */
-    public function detachFiles($type = null):void
+    public function detachFiles($type = null): void
     {
         $this->syncFiles([], $type);
     }
