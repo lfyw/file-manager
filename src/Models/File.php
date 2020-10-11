@@ -33,7 +33,7 @@ class File extends Model
      * Upload and store a file
      * @param $file
      * @param bool $ext 是否保存文件原后缀
-     * @return array
+     * @return File
      */
     public static function upload($file, $guessExtension = true)
     {
@@ -41,7 +41,7 @@ class File extends Model
         //保存文件
         $path = $guessExtension
             ? Storage::putFile(config('file-manager.path'), $file)
-            : Storage::putFileAs(config('file-manager.path'), $file, Str::random(40) . '.'.$file->getClientOriginalExtension());
+            : Storage::putFileAs(config('file-manager.path'), $file, Str::random(40) . '.' . $file->getClientOriginalExtension());
 
         return static::create([
             'original_name' => $file->getClientOriginalName(),//原文件名
