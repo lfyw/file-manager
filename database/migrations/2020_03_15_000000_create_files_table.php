@@ -24,7 +24,7 @@ class CreateFilesTable extends Migration
             $table->json('extra')->nullable()->comment('文件额外信息');
             $table->timestamps();
         });
-        DB::statement("ALTER TABLE files comment '文件上传表'");
+
     }
 
     /**
