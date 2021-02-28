@@ -33,6 +33,29 @@ trait HasFiles
     }
 
     /**
+     * Sync file between specify model and file without detaching old files
+     * @param $fileIds
+     * @param string|null $type
+     * @return bool
+     */
+    public function syncFilesWithoutDetaching($fileIds, ?string $type = null): bool
+    {
+        if (!is_array($fileIds)) {
+            $fileIds = [$fileIds];
+        }
+
+        $this->isInTable($fileIds);
+        $values = ['model_type' => static::class];
+        $values = $type ? array_merge($values, ['file_type' => $type]) : $values;
+
+        $changes = $this->files()->syncWithoutDetaching(array_fill_keys($fileIds, $values));
+
+        $this->destroyFileAfterSync($changes);
+
+        return true;
+    }
+
+    /**
      * Relations with files
      * @return BelongsToMany
      */
@@ -70,7 +93,7 @@ trait HasFiles
     private function destroyFileAfterSync($changes): void
     {
         if (config('file-manager.clear_sync_file')) {
-            foreach ($changes['detached'] as $changeId){
+            foreach ($changes['detached'] as $changeId) {
                 File::destroy($changeId);
             }
         }

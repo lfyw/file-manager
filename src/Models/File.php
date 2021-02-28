@@ -5,7 +5,6 @@ namespace Littledragoner\FileManager\Models;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Littledragoner\FileManager\Observers\FileObserver;
