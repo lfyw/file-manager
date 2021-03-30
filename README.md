@@ -100,13 +100,13 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         $user = User::find(1);
-        return response()->json(['data' => $user->syncFiles([3,4])]);
+        return response()->json(['data' => $user->addAttach([3,4])->syncFiles()]);
     }
 }
 ```
 如果这个模型上有多种类型的文件，如用户有头像、有个人简历等多种附件，则需要给每种类型的附件增加一个标识字段作为方法的第二个参数。
 ```php
-$user->syncFiles([3,4], 'avatar');
+$user->addAttach([3,4], 'avatar')->syncFiles();
 ```
 可以像下面这样获取某个模型关联的特定类型文件，不加参数返回这个模型关联的所有文件
 ```

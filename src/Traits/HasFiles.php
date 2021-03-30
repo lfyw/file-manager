@@ -9,36 +9,25 @@ use Littledragoner\FileManager\Models\File;
 
 trait HasFiles
 {
+    protected $syncParameters = [];
+
     /**
      * Sync file between specify model and file
      * @param $fileIds
      * @param string|null $type
      * @return bool
      */
-    public function syncFiles($fileIds, ?string $type = null): bool
+    public function syncFiles(): bool
     {
-        if (!is_array($fileIds)) {
-            $fileIds = [$fileIds];
-        }
 
-        $this->isInTable($fileIds);
-        $values = ['model_type' => static::class];
-        $values = $type ? array_merge($values, ['file_type' => $type]) : $values;
-
-        $changes = $this->files()->sync(array_fill_keys($fileIds, $values));
+        $changes = $this->files()->sync($this->syncParameters);
 
         $this->destroyFileAfterSync($changes);
 
         return true;
     }
 
-    /**
-     * Sync file between specify model and file without detaching old files
-     * @param $fileIds
-     * @param string|null $type
-     * @return bool
-     */
-    public function syncFilesWithoutDetaching($fileIds, ?string $type = null): bool
+    public function addAttach($fileIds, ?string $type = null): self
     {
         if (!is_array($fileIds)) {
             $fileIds = [$fileIds];
@@ -47,12 +36,8 @@ trait HasFiles
         $this->isInTable($fileIds);
         $values = ['model_type' => static::class];
         $values = $type ? array_merge($values, ['file_type' => $type]) : $values;
-
-        $changes = $this->files()->syncWithoutDetaching(array_fill_keys($fileIds, $values));
-
-        $this->destroyFileAfterSync($changes);
-
-        return true;
+        $this->syncParameters += array_fill_keys($fileIds, $values);
+        return $this;
     }
 
     /**
