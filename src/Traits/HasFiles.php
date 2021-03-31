@@ -19,7 +19,9 @@ trait HasFiles
      */
     public function syncFiles(): bool
     {
-
+        if (!$this->syncParameters){
+            return false;
+        }
         $changes = $this->files()->sync($this->syncParameters);
 
         $this->destroyFileAfterSync($changes);
@@ -29,6 +31,9 @@ trait HasFiles
 
     public function addAttach($fileIds, ?string $type = null): self
     {
+        if (!$fileIds){
+            return $this;
+        }
         if (!is_array($fileIds)) {
             $fileIds = [$fileIds];
         }
