@@ -17,9 +17,9 @@ trait HasFiles
      * @param string|null $type
      * @return bool
      */
-    public function syncFiles(): bool
+    public function syncFiles($force = false): bool
     {
-        if (!$this->syncParameters){
+        if (!$this->syncParameters && $force == false){
             return false;
         }
         $changes = $this->files()->sync($this->syncParameters);
@@ -73,7 +73,11 @@ trait HasFiles
      */
     public function detachFiles($type = null): void
     {
-        $this->syncFiles([], $type);
+        if (!$type){
+            $this->syncParameters = [];
+            $this->syncFiles(true);
+        }
+        $this->addAttach([], $type)->syncFiles(true);
     }
 
     /**
