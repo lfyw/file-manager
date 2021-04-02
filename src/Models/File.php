@@ -17,10 +17,6 @@ class File extends Model
         'extra' => 'array'
     ];
 
-    protected $hidden = [
-        'pivot'
-    ];
-
     public static function boot()
     {
         parent::boot();
