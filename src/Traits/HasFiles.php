@@ -30,6 +30,23 @@ trait HasFiles
     }
 
     /**
+     * @todo
+     * Sync files without Detaching
+     * @return void
+     */
+    public function syncFilesWithoutDetaching($fileIds, $fileType):bool
+    {
+        $this->loadFiles('files:id');
+         if($files = $this->files){
+             foreach ($files as $file){
+                 if($fileType == $file->pivot->file_type) continue;
+                 $this->addAttach($file->id, $file->pivot->file_type);
+             }
+         }
+         return $this->addAttach($fileIds)->syncFiles();
+    }
+
+    /**
      * Add file to model.
      * @param $fileIds
      * @param string|null $type
