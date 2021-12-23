@@ -29,6 +29,12 @@ trait HasFiles
         return true;
     }
 
+    /**
+     * Add file to model.
+     * @param $fileIds
+     * @param string|null $type
+     * @return $this
+     */
     public function addAttach($fileIds, ?string $type = null): self
     {
         if (!$fileIds){
