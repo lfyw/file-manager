@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Littledragoner\FileManager;
+namespace Lfyw\FileManager;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\ServiceProvider;
@@ -34,7 +34,7 @@ class FileManagerProvider extends ServiceProvider
         Builder::macro('withFiles', function ($type = null) {
             return $this->when($type, function ($builder) use ($type) {
                 return $builder::with(['files' => function ($builder) use ($type) {
-                    return $builder->where('file_type', $type);
+                    return is_array($type) ? $builder->where('fileables.type','in', $type) : $builder->where('fileables.type', $type);
                 }]);
             }, function ($builder) {
                 return $builder::with('files');

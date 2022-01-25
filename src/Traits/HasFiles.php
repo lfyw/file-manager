@@ -1,112 +1,146 @@
 <?php
 
 
-namespace Littledragoner\FileManager\Traits;
+namespace Lfyw\FileManager\Traits;
 
 
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Littledragoner\FileManager\Models\File;
+use Lfyw\FileManager\Models\File;
+use Illuminate\Support\Facades\DB;
 
 trait HasFiles
 {
-    protected $syncParameters = [];
+    protected array $fileStash = [];
 
-    /**
-     * Sync file between specify model and file
-     * @param $fileIds
-     * @param string|null $type
-     * @return bool
-     */
-    public function syncFiles($force = false): bool
+    protected bool $forceSync = false;
+
+    public function files()
     {
-        if (!$this->syncParameters && $force == false){
-            return false;
+        return $this->morphToMany(File::class, 'fileable')->withPivot('type');
+    }
+
+    public function detachFiles($param = null, string $type = null)
+    {
+        $fileIds =  DB::table('fileables')
+        ->when(filled($param), function($builder) use ($param){
+            return is_array($param) ? $builder->whereIn('file_id', $param) : $builder->where('file_id', $param);
+        })
+        ->when(filled($type), function($builder) use ($type){
+            return $builder->where('type', $type);
+        })
+        ->pluck('file_id')
+        ->toArray();
+
+        $this->files()->detach($fileIds);
+        File::destroy($fileIds);
+
+        return $fileIds;
+    }
+
+    public function syncFilesWithoutDetaching($param = null, string $type = null)
+    {
+        $this->addFiles($param, $type);
+        if($this->fileStash || $this->forceSync === true){
+            $changes = $this->files()->syncWithoutDetaching($this->fileStash);
+            $this->destroyFileAfterSync($changes);
+            return true;
         }
-        $changes = $this->files()->sync($this->syncParameters);
+        return false;
+    }
 
-        $this->destroyFileAfterSync($changes);
+    public function syncFiles($param = null, string $type = null)
+    {
+        $this->addFiles($param, $type);
+        if($this->fileStash || $this->forceSync === true){
+            $changes = $this->files()->sync($this->fileStash);
+            $this->destroyFileAfterSync($changes);
+            return true;
+        }
+        return false;
+    }
 
-        return true;
+    public function attachFiles($param = null, string $type = null)
+    {
+        $this->addFiles($param, $type);
+        return $this->files()->attach($this->fileStash);
     }
 
     /**
-     * @todo
-     * Sync files without Detaching
+     * addFiles
+     * @param  mixed $param
+     * @param  mixed $type
      * @return void
      */
-    public function syncFilesWithoutDetaching($fileIds, $fileType):bool
+    public function addFiles($param = null, string $type = null):self
     {
-        $this->loadFiles('files:id');
-         if($files = $this->files){
-             foreach ($files as $file){
-                 if($fileType == $file->pivot->file_type) continue;
-                 $this->addAttach($file->id, $file->pivot->file_type);
-             }
-         }
-         return $this->addAttach($fileIds)->syncFiles();
-    }
-
-    /**
-     * Add file to model.
-     * @param $fileIds
-     * @param string|null $type
-     * @return $this
-     */
-    public function addAttach($fileIds, ?string $type = null): self
-    {
-        if (!$fileIds){
-            return $this;
-        }
-        if (!is_array($fileIds)) {
-            $fileIds = [$fileIds];
-        }
-
-        $this->isInTable($fileIds);
-        $values = ['model_type' => static::class];
-        $values = $type ? array_merge($values, ['file_type' => $type]) : $values;
-        $this->syncParameters += array_fill_keys($fileIds, $values);
+        $this->fileStash += $this->qualifyParam($param, $type);
         return $this;
     }
 
     /**
-     * Relations with files
-     * @return BelongsToMany
+     * forceAttach
+     * Force attach will delete the previous existing files.
+     * @return void
      */
-    public function files(): BelongsToMany
+    public function forceSync($param):self
     {
-        return $this->belongsToMany(File::class, 'file_model', 'model_id', 'file_id', 'id', 'id')->withPivot(['model_id', 'file_type'])->wherePivot('model_type', static::class);
+        $this->forceSync = $param ?? true;
+        return $this;
     }
 
-    /**
-     * Load relation files on a specify model
-     * @param null $type
-     * @return mixed
-     */
     public function loadFiles($type = null)
     {
-        return $type
-            ? $this->load(['files' => function ($builder) use ($type) {
-                return $builder->where('file_type', $type);
-            }])
-            : $this->load('files');
+        $this->load(['files' => function($builder) use ($type){
+            $builder->when($type, function($builder) use ($type){
+                return is_array($type) ? $builder->whereIn('fileables.type', $type) : $builder->where('fileables.type', $type);
+            });
+        }]);
     }
 
     /**
-     * Detach related files
+     * qualifyParam
+     * form 1 ($param = 1)
+     * form 2 ($param = [1,2])
+     * form 3 ($param = 1, 'avatar')
+     * form 4 ($param = [1,2], 'avatar')
+     * form 5 ($param = [1 => 'avatar', '2' => 'background'])
+     * @param  mixed $param file param
+     * @param  mixed $type file type
+     * @return array formed file array
+     * form 1 []
+     * form 3 [1 => 'avatar', 2 => 'background']
      */
-    public function detachFiles($type = null): void
+    protected function qualifyParam($param = null, string $type = null):array
     {
-        if (!$type){
-            $this->syncParameters = [];
-            $this->syncFiles(true);
+        if(!$param){
+            return [];
         }
-        $this->addAttach([], $type)->syncFiles(true);
+        if(!is_array($param)){
+            return $type ? [$param => ['type' => $type]] : [$param => ['type' => null]];
+        }
+        if($type){
+            return array_fill_keys($param, $type);
+        }
+        if($this->arrayIsAssoc($param)){
+            $newParam = [];
+            foreach($param as $key => $value){
+                $newParam[$key] = ['type' => $value];
+            }
+            return $newParam;
+        }
+
+        return array_fill_keys($param, ['type' => null]);
     }
 
-    /**
-     * Destroy file after sync
-     * @param $changes
-     */
+    private function arrayIsAssoc($array):bool
+    {
+        if(!is_array($array)){
+            return false;
+        }
+        $keys = array_keys($array);
+
+        return $keys != array_keys($keys);
+    }
+
     private function destroyFileAfterSync($changes): void
     {
         if (config('file-manager.clear_sync_file')) {
@@ -115,14 +149,4 @@ trait HasFiles
             }
         }
     }
-
-    /**
-     * Check file id is in files table
-     * @param $fileIds
-     */
-    protected function isInTable($fileIds): void
-    {
-        File::findOrFail($fileIds);
-    }
-
 }

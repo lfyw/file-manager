@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Littledragoner\FileManager\Exceptions;
+namespace Lfyw\FileManager\Exceptions;
 
 
 class AssociateMethodNotExist extends Exception

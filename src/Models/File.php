@@ -1,26 +1,26 @@
 <?php
 
 
-namespace Littledragoner\FileManager\Models;
+namespace Lfyw\FileManager\Models;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Littledragoner\FileManager\Observers\FileObserver;
+use Lfyw\FileManager\Observers\FileObserver;
 
 class File extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'original_name', 'save_name', 'path', 'url', 'extension', 'extra', 'created_at', 'updated_at'
+    ];
 
     protected $casts = [
         'extra' => 'array'
     ];
 
-    public static function boot()
+    public static function booted()
     {
-        parent::boot();
-
         static::observe(FileObserver::class);
     }
 
@@ -30,26 +30,33 @@ class File extends Model
      * @param bool $ext 是否保存文件原后缀
      * @return File
      */
-    public static function upload($file, $guessExtension = true)
+    public static function upload($file, $keepOriginalName = false, $guessExtension = true)
     {
         throw_unless($file, new FileNotFoundException('File not found'));
-        //保存文件
-        $path = $guessExtension
-            ? Storage::putFile(config('file-manager.path'), $file)
-            : Storage::putFileAs(config('file-manager.path'), $file, Str::random(40) . '.' . $file->getClientOriginalExtension());
+
+        $clientOriginalExtension = $file->getClientOriginalExtension();
+        $clientOriginalName = $file->getClientOriginalName();
+        $fileExtension = $file->extension();
+
+        $extension = $guessExtension ? $fileExtension : $clientOriginalExtension;
+        $filename = $keepOriginalName ? $clientOriginalName : Str::random(40) . '.' . $extension;
+
+        $savePath = Storage::putFileAs(config('file-manager.path'), $file, $filename);
+        $saveName = str_replace(config('file-manager.path') . '/', '', $savePath);
+        $publicPath =  str_replace('public/', '', $savePath);
 
         return static::create([
-            'original_name' => $file->getClientOriginalName(),//原文件名
-            'save_name' => str_replace(config('file-manager.path') . '/', '', $path),
-            'path' => str_replace('public/', '', $path),
-            'url' => Storage::url($path),
-            'extension' => $file->getClientOriginalExtension(),//原扩展名
+            'original_name' => $clientOriginalName,
+            'save_name' => $saveName,
+            'path' => $publicPath,
+            'url' => Storage::url($savePath),
+            'extension' => $extension,
             'extra' => [
-                'client_extension' => $file->clientExtension(),//扩展名
-                'clientMineType' => $file->getClientMimeType(),//mime类型
-                'extension' => $file->extension(),//扩展名
-                'size' => $file->getSize() //文件大小
-            ]
+                'client_extension' => $file->extension(),
+                'client_mine_type' => $file->getClientMimeType(),
+                'extension' => $file->extension(),
+                'size' => $file->getSize(),
+            ],
         ]);
     }
 

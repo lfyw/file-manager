@@ -1,10 +1,10 @@
 {
-    "name": "littledragoner/file-manager",
+    "name": "lfyw/file-manager",
     "description": "A file manager",
     "license": "MIT",
     "authors": [
         {
-            "name": "littledragoner",
+            "name": "lfyw",
             "email": "littledragoner@163.com"
         }
     ],
@@ -13,7 +13,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Littledragoner\\FileManager\\": [
+            "Lfyw\\FileManager\\": [
                 "src"
             ]
         },
@@ -24,7 +24,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Littledragoner\\FileManager\\FileManagerProvider"
+                "Lfyw\\FileManager\\FileManagerProvider"
             ]
         }
     }
