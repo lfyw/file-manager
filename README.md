@@ -6,12 +6,12 @@
 ## 安装
 
 ```shell
-$ composer require littledragoner/file-manager
+$ composer require lfyw/file-manager
 ```
 
 ## 使用
 
-* 数据库迁移
+### 数据库迁移
 
 执行数据库迁移:
  ```shell script
@@ -22,7 +22,7 @@ $ php artisan migrate
 $ php artisan vendor:publish --tag='migrations'
 ```
  
-* 配置
+### 配置
 
 导出配置文件:
 ```shell script
@@ -37,15 +37,17 @@ return [
 ];
 ``` 
 
-* 上传文件
+### 文件上传`
 
-像下面这样来上传文件。可以传递第二个参数决定是否根据文件 MIME 类型推测文件后缀，默认`true`, 如果要保存文件的原后缀名请改为`false`
+**upload($file, $keepOriginalName = false, $guessExtension = true)**
+
+像下面这样来上传文件。第一个参数是上传的文件;第二个参数是上传时是否以原文件名进行保存，默认会重新命名;第三个参数是是否根据文件 MIME 类型推测文件后缀，默认`true`, 如果要保存文件的原后缀名请改为`false`
 ```php
 class FilesController extends Controller
 {
     public function store(Request $request)
     {
-        return \Littledragoner\FileManager\Models\File::upload($request->file('file', false));
+        return \Lfyw\FileManager\Models\File::upload($request->file('file', $keepOriginalName = false, $guessExtension = true));
     }
 }
 ```
@@ -68,7 +70,7 @@ class FilesController extends Controller
     "id": 17
 }
 ```
-* 同步文件
+### 文件关联
 
 在目标模型文件中引用`HasFiles`trait
 ```php
@@ -80,63 +82,101 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Littledragoner\FileManager\Traits;
+use Lfyw\FileManager\Traits;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasFiles;
 ```
+#### 新增文件关联
 
-使用`$user->syncFiles([3,4])`同步文件，参数是需要同步的文件`id`数组
-```shell script
-<?php
+> **attachFiles($param = null, string $type = null)**
 
-namespace App\Http\Controllers;
+```php
+$user = User::find(1);
+$user->attachFiles();//空参数或者会被判定为false的参数(如：[]，null)什么都不会做，意味着你无需额外判定参数是否存在或是否为空
+$user->attachFiles(1);//关联文件 id 为 1 的文件
+$user->attachFiles([1,2]);//可以同时关联多个文件，传递文件的 id 数组
+$user->attachFiles(1, 'avatar');//关联一个被标识为 avatar 的文件
+$user->attachFiles([1 => 'avatar', 2 => 'background'])//同时关联多个不同标识的文件
+```
 
-use App\Models\User;
+#### 同步文件关联
 
-class UsersController extends Controller
+> **syncFiles($param = null, string $type = null)**
+
+接受一个参数替换原本的关联，未在参数中的原关联会被移除。
+
+```php
+$user = User::find(1);
+$user->syncFiles();//空参数或者会被判定为false的参数(如：[]，null)什么都不会做，意味着你无需额外判定参数是否存在或是否为空
+$user->syncFiles(1);//同步关联文件 id 为 1 的文件
+$user->syncFiles([1,2]);//可以同步关联多个文件，传递文件的 id 数组
+$user->syncFiles(1, 'avatar');//同步关联一个被标识为 avatar 的文件
+$user->syncFiles([1 => 'avatar', 2 => 'background'])//同步关联多个不同标识的文件
+```
+#### 同步不移除
+
+> **syncFilesWithoutDetaching($param = null, string $type = null)**
+
+用法同 `syncFiles()` 一致，同步的时候不会移除原先的关联
+
+#### 移除关联
+
+> **detachFiles($param = null, string $type = null)**
+
+```php
+$user = User::find(1);
+$user->detachFiles(1);//移除文件 id 为 1 的关联
+$user->detachFiles([1,2]);//移除文件 id 为 1 和 2 的关联
+$user->detachFiles(type: 'avatar');//移除标识为 `avatar` 的关联
+$user->detachFiles();//移除所有关联
+```
+
+#### 追加文件
+
+> **addFiles($param = null, string $type = null)**
+
+```php
+$user = User::find(1);
+//追加文件
+$user->addFiles(1);
+$user->addFiles([2]);
+$user->attachFiles();
+//兼容链式调用与方法本来的所有传参形式：
+$user->addFiles([11 => 'avatar'])->attachFiles(12, 'background');
+//同样适用于 syncFiles() syncFilesWithoutDetaching()
+$user->addFiles([7 => 'avatar'])->syncFiles(9, 'background');
+```
+
+#### 强制同步
+
+> **forceSync(bool$param = true)**
+
+当使用`syncFiles()`同步文件时，方法会默认对参数做空判断，如果参数为空则不执行任何操作，从而避免手动判断文件参数是否为空。但在某些情况下，如编辑的时候取消了图片，此时需要将空参数也参与同步关联,可以使用该方法进行强制同步:
+
+```php
+public function store(Request $request)
 {
-    public function store(Request $request)
-    {
-        $user = User::find(1);
-        return response()->json(['data' => $user->addAttach([3,4])->syncFiles()]);
-    }
+    $user = User::find(1);
+    $user->forceSync()->syncFiles($request->file_ids);//如果 $request->file_ids 为空，则同步后不关联任何文件。
 }
 ```
-如果这个模型上有多种类型的文件，如用户有头像、有个人简历等多种附件，则需要给每种类型的附件增加一个标识字段作为方法的第二个参数。
+
+注意:由于`syncFilesWithoutDetaching()`是同步不移除，所以`forceSync()`对`syncFilesWithoutDetaching`无效.
+
+#### 预加载
+
 ```php
-$user->addAttach([3,4], 'avatar')->syncFiles();
+$user = User::withFiles('avatar')->get();
 ```
-可以像下面这样获取某个模型关联的特定类型文件，不加参数返回这个模型关联的所有文件
-```
+#### 延迟预加载
+
+```php
 $user = User::find(1);
 $user->loadFiles('avatar');
-```
-可以直接在`ORM`上调用`withFiles`来预加载关联模型，可以传递相关标识参数预加载特定类型的文件
-```
-User::withFiles('avatar')->get()
-```
-要解除关系，可以使用:
-```php
-$user = User::find(1);
-$user->detachFiles('avatar');
 ```
 
 ## License
 
 MIT
-
-
-
-1. 应当有多态
-2. 应当有一个类型区分多态中的不同类型
-3. 应当可以预加载
-4. 预加载应当可以指定字段
-5. 删除时应当清空图片
-6. 应当考虑新增和同步的情况
-
-
-
-
-一个文件归属于一个模型，一个模型可以对应多个文件  多态一堆多 做成多态多对多

@@ -81,9 +81,9 @@ trait HasFiles
      * Force attach will delete the previous existing files.
      * @return void
      */
-    public function forceSync($param):self
+    public function forceSync(bool $param = true):self
     {
-        $this->forceSync = $param ?? true;
+        $this->forceSync = $param;
         return $this;
     }
 
