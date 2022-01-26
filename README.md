@@ -37,7 +37,7 @@ return [
 ];
 ``` 
 
-### 文件上传`
+### 文件上传
 
 **upload($file, $keepOriginalName = false, $guessExtension = true)**
 
