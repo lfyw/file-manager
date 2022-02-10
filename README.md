@@ -47,7 +47,7 @@ class FilesController extends Controller
 {
     public function store(Request $request)
     {
-        return \Lfyw\FileManager\Models\File::upload($request->file('file', $keepOriginalName = false, $guessExtension = true));
+        return \Lfyw\FileManager\Models\File::upload($request->file('file'), $keepOriginalName = false, $guessExtension = true);
     }
 }
 ```
