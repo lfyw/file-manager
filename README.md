@@ -82,7 +82,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Lfyw\FileManager\Traits;
+use Lfyw\FileManager\Traits\HasFiles;
 
 class User extends Authenticatable
 {

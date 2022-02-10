@@ -89,7 +89,7 @@ trait HasFiles
 
     public function loadFiles($type = null)
     {
-        $this->load(['files' => function($builder) use ($type){
+        return $this->load(['files' => function($builder) use ($type){
             $builder->when($type, function($builder) use ($type){
                 return is_array($type) ? $builder->whereIn('fileables.type', $type) : $builder->where('fileables.type', $type);
             });
