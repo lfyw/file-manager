@@ -52,9 +52,9 @@ class File extends Model
             'url' => Storage::url($savePath),
             'extension' => $extension,
             'extra' => [
-                'client_extension' => $file->extension(),
+                'client_extension' => $clientOriginalExtension,
                 'client_mine_type' => $file->getClientMimeType(),
-                'extension' => $file->extension(),
+                'extension' => $fileExtension,
                 'size' => $file->getSize(),
             ],
         ]);
