@@ -13,11 +13,13 @@ class CreateFileablesTable extends Migration
      */
     public function up()
     {
-        Schema::create('fileables', function (Blueprint $table) {
-            $table->bigInteger('file_id')->index();
-            $table->morphs('fileable');
-            $table->string('type')->nullable();
-        });
+        if(!Schema::hasTable('fileables')){
+            Schema::create('fileables', function (Blueprint $table) {
+                $table->bigInteger('file_id')->index();
+                $table->morphs('fileable');
+                $table->string('type')->nullable();
+            });
+        }
     }
 
     /**
