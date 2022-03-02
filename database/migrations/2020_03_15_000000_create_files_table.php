@@ -13,7 +13,7 @@ class CreateFilesTable extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('fileables')){
+        if(!Schema::hasTable('files')){
             Schema::create('files', function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->string('original_name');
