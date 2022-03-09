@@ -36,23 +36,23 @@ trait HasFiles
         return $fileIds;
     }
 
-    public function syncFilesWithoutDetaching($param = null, string $type = null)
+    public function syncFilesWithoutDetaching($param = null, string $type = null, $clear = false)
     {
         $this->addFiles($param, $type);
         if($this->fileStash || $this->forceSync === true){
             $changes = $this->files()->syncWithoutDetaching($this->fileStash);
-            $this->destroyFileAfterSync($changes);
+            $this->destroyFileAfterSync($changes, $clear);
             return true;
         }
         return false;
     }
 
-    public function syncFiles($param = null, string $type = null)
+    public function syncFiles($param = null, string $type = null, $clear = false)
     {
         $this->addFiles($param, $type);
         if($this->fileStash || $this->forceSync === true){
             $changes = $this->files()->sync($this->fileStash);
-            $this->destroyFileAfterSync($changes);
+            $this->destroyFileAfterSync($changes, $clear);
             return true;
         }
         return false;
@@ -141,9 +141,9 @@ trait HasFiles
         return $keys != array_keys($keys);
     }
 
-    private function destroyFileAfterSync($changes): void
+    private function destroyFileAfterSync($changes, $clear = false): void
     {
-        if (config('file-manager.clear_sync_file')) {
+        if (config('file-manager.clear_sync_file') || $clear) {
             foreach ($changes['detached'] as $changeId) {
                 File::destroy($changeId);
             }
