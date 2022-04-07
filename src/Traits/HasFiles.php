@@ -118,7 +118,7 @@ trait HasFiles
             return $type ? [$param => ['type' => $type]] : [$param => ['type' => null]];
         }
         if($type){
-            return array_fill_keys($param, $type);
+            return array_fill_keys($param, ['type' => $type]);
         }
         if($this->arrayIsAssoc($param)){
             $newParam = [];
