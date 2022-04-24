@@ -27,6 +27,8 @@ trait HasFiles
         ->when(filled($type), function($builder) use ($type){
             return $builder->where('type', $type);
         })
+        ->where('fileable_id', $this->id)
+        ->where('fileable_type', get_class($this))
         ->pluck('file_id')
         ->toArray();
 
