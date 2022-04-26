@@ -163,7 +163,7 @@ trait HasFiles
                 })
                 ->get();
             foreach ($currentFiles as $currentFile){
-                $this->addFiles($currentFile->id, $currentFile->type);
+                $this->addFiles($currentFile->file_id, $currentFile->type);
             }
         }
     }
