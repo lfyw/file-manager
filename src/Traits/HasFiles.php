@@ -51,7 +51,7 @@ trait HasFiles
 
     public function syncFiles($param = null, string $type = null, $clear = false)
     {
-        $this->syncKeepOtherType($param, $type);
+        $this->syncKeepOtherType($type);
         $this->addFiles($param, $type);
         if($this->fileStash || $this->forceSync === true){
             $changes = $this->files()->sync($this->fileStash);
@@ -153,7 +153,7 @@ trait HasFiles
         }
     }
 
-    private function syncKeepOtherType($param, $type)
+    private function syncKeepOtherType($type)
     {
         if ($type){
             //获取除了类型之外的其他文件，这些文件需要作为非改动字段自动录入
