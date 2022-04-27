@@ -51,7 +51,7 @@ trait HasFiles
 
     public function syncFiles($param = null, string $type = null, $clear = false)
     {
-        $this->syncKeepOtherType($type);
+        $this->syncKeepOtherType($param, $type);
         $this->addFiles($param, $type);
         if($this->fileStash || $this->forceSync === true){
             $changes = $this->files()->sync($this->fileStash);
@@ -153,11 +153,14 @@ trait HasFiles
         }
     }
 
-    private function syncKeepOtherType($type)
+    private function syncKeepOtherType($param, $type)
     {
         if ($type){
             //获取除了类型之外的其他文件，这些文件需要作为非改动字段自动录入
             $currentFiles = DB::table('fileables')
+                ->when(filled($param), function($builder) use ($param){
+                    return is_array($param) ? $builder->whereIn('file_id', $param) : $builder->where('file_id', $param);
+                })
                 ->when(filled($type), function($builder) use ($type){
                     return $builder->where('type', '<>',  $type);
                 })
