@@ -167,6 +167,11 @@ trait HasFiles
         return array_fill_keys($param, ['type' => null]);
     }
 
+    /**
+     * 数组是否是关联数组
+     * @param $array
+     * @return bool
+     */
     private function arrayIsAssoc($array): bool
     {
         if (!is_array($array)) {
@@ -177,6 +182,12 @@ trait HasFiles
         return $keys != array_keys($keys);
     }
 
+    /**
+     * 同步后删除文件
+     * @param array $changes 发生变化的文件id
+     * @param bool $clear 是否删除源文件
+     * @return void
+     */
     private function destroyFileAfterSync($changes, $clear = false): void
     {
         if (config('file-manager.clear_sync_file') || $clear) {
@@ -186,6 +197,11 @@ trait HasFiles
         }
     }
 
+    /**
+     * 保留除当前类型外的其他所有类型文件
+     * @param string $type 类型
+     * @return void
+     */
     private function syncKeepOtherType($type)
     {
         if ($type) {
