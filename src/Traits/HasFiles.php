@@ -61,9 +61,9 @@ trait HasFiles
      * @param mixed $param 文件
      * @param string|null $type 指定文件类型
      * @param bool $clear 同步后是否删除源文件
-     * @return void
+     * @return bool
      */
-    public function syncOnlyCurrentTypeFiles($param = null, string $type = null, $clear = false,)
+    public function syncOnlyCurrentTypeFiles($param = null, string $type = null, $clear = false)
     {
         return $this->syncFiles($param, $type, $clear, true);
     }

@@ -103,9 +103,9 @@ $user->attachFiles([1 => 'avatar', 2 => 'background'])//同时关联多个不同
 
 #### 同步文件关联
 
-> **syncFiles($param = null, string $type = null)**
+> **syncFiles($param = null, string $type = null, $clear = true, $onlyCurrent = true)**
 
-接受一个参数替换原本的关联，未在参数中的原关联会被移除。
+接受一个参数替换原本的关联，未在参数中的原关联会被移除 。如果`$onlyCurrent`的值为 true,则同步关联仅同步当前`type`的关联文件，而不会影响其他`type`。
 
 ```php
 $user = User::find(1);
@@ -114,12 +114,19 @@ $user->syncFiles(1);//同步关联文件 id 为 1 的文件
 $user->syncFiles([1,2]);//可以同步关联多个文件，传递文件的 id 数组
 $user->syncFiles(1, 'avatar');//同步关联一个被标识为 avatar 的文件
 $user->syncFiles([1 => 'avatar', 2 => 'background'])//同步关联多个不同标识的文件
+
 ```
+#### 同步当前类型文件关联
+
+> **syncOnlyCurrentTypeFiles($param = null, string $type = null, $onlyCurrent = true)**
+
+等同于`syncFiles($onlyCurrent = true)`
+
 #### 同步不移除
 
-> **syncFilesWithoutDetaching($param = null, string $type = null)**
+> **syncFilesWithoutDetaching($param = null, string $type = null, $clear = false)**
 
-用法同 `syncFiles()` 一致，同步的时候不会移除原先的关联
+用法同 `syncFiles()` 一致，同步的时候不会移除原先的关联文件
 
 #### 移除关联
 
