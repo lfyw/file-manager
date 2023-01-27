@@ -11,6 +11,8 @@ trait HasFiles
 {
     protected array $fileStash = [];
 
+    protected bool $forceSync = false;
+
     /**
      * 多态关联
      * @return mixed
@@ -46,7 +48,7 @@ trait HasFiles
             $this->syncKeepOtherType($type);
         }
         $this->addFiles($param, $type);
-        if ($this->fileStash) {
+        if ($this->fileStash || $this->forceSync === true ) {
             $changes = $this->files()->sync($this->fileStash);
             $this->destroyFileAfterSync($changes, $clear);
             return true;
@@ -63,7 +65,7 @@ trait HasFiles
      */
     public function syncOnlyCurrentTypeFiles($param = null, string $type = null, $clear = false,)
     {
-        $this->syncFiles($param, $type, $clear, true);
+        return $this->syncFiles($param, $type, $clear, true);
     }
 
     /**
@@ -76,12 +78,23 @@ trait HasFiles
     public function syncFilesWithoutDetaching($param = null, string $type = null, $clear = false)
     {
         $this->addFiles($param, $type);
-        if ($this->fileStash) {
+        if ($this->fileStash || $this->forceSync === true) {
             $changes = $this->files()->syncWithoutDetaching($this->fileStash);
             $this->destroyFileAfterSync($changes, $clear);
             return true;
         }
         return false;
+    }
+
+    /**
+     * forceAttach
+     * Force attach will delete the previous existing files.
+     * @return void
+     */
+    public function forceSync(bool $param = true):self
+    {
+        $this->forceSync = $param;
+        return $this;
     }
 
     /**
