@@ -136,6 +136,11 @@ trait HasFiles
         return $this;
     }
 
+    /**
+     * 延迟预加载
+     * @param $type
+     * @return mixed
+     */
     public function loadFiles($type = null)
     {
         return $this->load(['files' => function ($builder) use ($type) {
@@ -143,6 +148,17 @@ trait HasFiles
                 return is_array($type) ? $builder->whereIn('fileables.type', $type) : $builder->where('fileables.type', $type);
             });
         }]);
+    }
+
+    /**
+     * 延迟预加载关联文件数量
+     * @param $type
+     * @return mixed
+     */
+    public function loadFilesCount($type = null){
+        return $this->loadCount(['files' => function($builder) use ($type){
+            $builder->when($type, fn($query) => $query->where('type', $type));
+        }])?->files_count;
     }
 
     /**
@@ -231,5 +247,6 @@ trait HasFiles
             }
         }
     }
+
 
 }

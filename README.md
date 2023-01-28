@@ -184,6 +184,12 @@ $user = User::find(1);
 $user->loadFiles('avatar');
 ```
 
+#### 延迟加载文件数量
+
+```php
+$count = $user->loadFilesCount('type1');
+```
+
 ## License
 
 MIT
