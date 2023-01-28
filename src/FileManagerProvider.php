@@ -14,6 +14,7 @@ class FileManagerProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->registerWithFiles();
+        $this->registerWithFilesCount();
     }
 
     public function register()
@@ -38,6 +39,19 @@ class FileManagerProvider extends ServiceProvider
                 }]);
             }, function ($builder) {
                 return $builder::with('files');
+            });
+        });
+    }
+
+    protected function registerWithFilesCount()
+    {
+        Builder::macro('withFilesCount', function ($type = null) {
+            return $this->when($type, function ($builder) use ($type) {
+                return $builder::withCount(['files' => function ($builder) use ($type) {
+                    return is_array($type) ? $builder->where('fileables.type','in', $type) : $builder->where('fileables.type', $type);
+                }]);
+            }, function ($builder) {
+                return $builder::withCount('files');
             });
         });
     }

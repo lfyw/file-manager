@@ -183,6 +183,10 @@ $user = User::withFiles('avatar')->get();
 $user = User::find(1);
 $user->loadFiles('avatar');
 ```
+#### 预加载计数
+```php
+$count = User::withFilesCount()->get();
+```
 
 #### 延迟加载文件数量
 
