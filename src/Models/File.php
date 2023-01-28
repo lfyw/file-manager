@@ -41,10 +41,14 @@ class File extends Model
         $extension = $guessExtension ? $fileExtension : $clientOriginalExtension;
         $filename = $keepOriginalName ? $clientOriginalName : Str::random(40) . '.' . $extension;
 
+        $customFileDir = Str::before(storage_path('app/public'), 'public') . config('file-manager.path');
+        if (!is_dir($customFileDir)){
+            mkdir($customFileDir, 0777, true);
+        }
+
         $savePath = Storage::putFileAs(config('file-manager.path'), $file, $filename);
         $saveName = str_replace(config('file-manager.path') . '/', '', $savePath);
-        $publicPath =  str_replace('public/', '', $savePath);
-
+        $publicPath = str_replace('public/', '', $savePath);
         return static::create([
             'original_name' => $clientOriginalName,
             'save_name' => $saveName,

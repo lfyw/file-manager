@@ -223,7 +223,7 @@ trait HasFiles
                 ->where('fileable_id', $this->id)
                 ->where('fileable_type', get_class($this))
                 ->when(filled($type), function ($builder) use ($type) {
-                    return $builder->where('type', '<>', $type);
+                    return $builder->where('type', '<>', $type)->orWhereNull('type');
                 })
                 ->get();
             foreach ($currentFiles as $currentFile) {
