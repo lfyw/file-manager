@@ -11,6 +11,14 @@ use Lfyw\FileManager\Observers\FileObserver;
 
 class File extends Model
 {
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        if (config('file-manager.connection')) {
+            $this->connection = config('file-manager.connection');
+        }
+    }
+
     protected $fillable = [
         'original_name', 'save_name', 'path', 'url', 'extension', 'extra', 'created_at', 'updated_at'
     ];
@@ -42,7 +50,7 @@ class File extends Model
         $filename = $keepOriginalName ? $clientOriginalName : Str::random(40) . '.' . $extension;
 
         $customFileDir = Str::before(storage_path('app/public'), 'public') . config('file-manager.path');
-        if (!is_dir($customFileDir)){
+        if (!is_dir($customFileDir)) {
             mkdir($customFileDir, 0777, true);
         }
 
