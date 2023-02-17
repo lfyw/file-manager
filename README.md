@@ -36,6 +36,15 @@ return [
     'clear_sync_file' => env('FILE_CLEAR', true)
 ];
 ``` 
+如果需要给模型设置另外的链接，则可以增加`connection`属性，会读取`database.connections`中对应的连接配置。
+```php
+return [
+    'path' => env('FILE_PATH', 'public/uploads'),
+    'clear_sync_file' => env('FILE_CLEAR', true),
+    'connection' => 'test'
+];
+```
+
 
 ### 文件上传
 
