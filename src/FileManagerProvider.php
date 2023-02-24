@@ -5,6 +5,8 @@ namespace Lfyw\FileManager;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\ServiceProvider;
+use Lfyw\FileManager\Commands\ListFilesCommand;
+use Lfyw\FileManager\Commands\PruneFilesCommand;
 
 class FileManagerProvider extends ServiceProvider
 {
@@ -15,6 +17,7 @@ class FileManagerProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->registerWithFiles();
         $this->registerWithFilesCount();
+        $this->registerConsoleCommands();
     }
 
     public function register()
@@ -54,5 +57,13 @@ class FileManagerProvider extends ServiceProvider
                 return $builder::withCount('files');
             });
         });
+    }
+
+    protected function registerConsoleCommands()
+    {
+        $this->commands([
+//            PruneFilesCommand::class,
+            ListFilesCommand::class
+        ]);
     }
 }

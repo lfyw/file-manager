@@ -123,7 +123,6 @@ trait HasFiles
         return $fileIds;
     }
 
-
     /**
      * addFiles
      * @param mixed $param
