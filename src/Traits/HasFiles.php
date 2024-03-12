@@ -238,9 +238,8 @@ trait HasFiles
                 ->where('fileable_id', $this->id)
                 ->where('fileable_type', get_class($this))
                 ->when(filled($type), function ($builder) use ($type) {
-                    return $builder->where('type', '<>', $type)->orWhereNull('type');
-                })
-                ->get();
+                    return $builder->where(fn($query) => $query->where('type', '<>', $type)->orWhereNull('type'));
+                })->get();
             foreach ($currentFiles as $currentFile) {
                 $this->addFiles($currentFile->file_id, $currentFile->type);
             }
